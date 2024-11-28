@@ -1,117 +1,66 @@
 <template>
-  <div class="auth-page">
-    <div class="login-page card">
-      <h2>登录</h2>
-      <form @submit.prevent="handleLogin" class="login-form">
-        <div class="form-group">
-          <label for="username">用户名</label>
-          <input id="username" v-model="formData.username" type="text" required>
-        </div>
-
-        <div class="form-group">
-          <label for="password">密码</label>
-          <input id="password" v-model="formData.password" type="password" required>
-        </div>
-
-        <button type="submit" class="btn login-btn" :disabled="loading">
-          {{ loading ? '登录中...' : '登录' }}
-        </button>
-
-        <p v-if="error" class="error-message">{{ error }}</p>
-      </form>
+  <div class="upload-container">
+    <h2>上传图片</h2>
+    <div class="upload-area" @click="handleUploadClick">
+      <p>点击、拖拽或粘贴图片到这里上传</p>
+      <p>支持 jpg、png、gif、webp、svg、bmp、tiff、ico、avif、heic/heif 格式</p>
+      <div class="upload-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L12 15"></path>
+          <path d="M5 10L12 17L19 10"></path>
+        </svg>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import useApi from '~/services/api';
-import { toast } from '~/composables/useToast';
-import { useAuth } from '~/composables/useAuth'; // 导入 useAuth 组合函数
-
-const api = useApi();
-const formData = ref({
-  username: '',
-  password: ''
-});
-
-const loading = ref(false);
-const error = ref('');
-const { setToken } = useAuth(); // 从 useAuth 获取 setToken 方法
-const router = useRouter(); // 使用 Router 进行页面导航
-
-// 处理登录逻辑
-const handleLogin = async () => {
-  try {
-    loading.value = true;
-    error.value = '';
-
-    const response = await api.login(formData.value);
-    if (response.success) {
-      setToken(response.token); // 保存用户 token
-      toast.showToast('登录成功', 'success'); // 显示成功提示
-      router.push('/upload'); // 导航到上传页面
-    } else {
-      error.value = response.message; // 显示错误信息
-    }
-  } catch (err) {
-    error.value = err.message; // 捕获并显示错误信息
-  } finally {
-    loading.value = false; // 登录完成后重置加载状态
-  }
+function handleUploadClick() {
+  // 跳转到登录页面
+  window.location.href = '/login';
 }
+
 </script>
 
 <style scoped>
-.auth-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--background-color);
-}
-.login-page {
-  padding: 2rem;
-  width: 100%;
-  max-width: 400px;
-}
-
-h2 {
+.upload-container {
   text-align: center;
-  margin-bottom: 2rem;
-  color: var(--text-color);
+  margin: 20px;
 }
 
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.upload-area {
+  border: 2px dashed #ccc;
+  padding: 30px;
+  border-radius: 10px;
+  margin: 20px 0;
+  transition: border-color 0.3s;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.upload-area:hover {
+  border-color: #007bff;
 }
 
-label {
-  color: var(--text-color);
+.upload-area p {
+  margin: 5px 0;
+  color: #666;
 }
 
-input {
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background-color: var(--background-color);
-  color: var(--text-color);
+.upload-icon {
+  margin-top: 10px;
+  color: #007bff;
 }
 
-.login-btn {
-  width: 100%;
+.paste-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.error-message {
-  color: #ef4444;
-  text-align: center;
+.paste-button:hover {
+  background-color: #0056b3;
 }
 </style>
