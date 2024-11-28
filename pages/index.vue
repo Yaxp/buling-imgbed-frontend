@@ -1,7 +1,5 @@
 <template>
   <div class="auth-page">
-
-
     <div class="login-page card">
       <h2>登录</h2>
       <form @submit.prevent="handleLogin" class="login-form">
@@ -23,42 +21,44 @@
       </form>
     </div>
   </div>
-
 </template>
 
 <script setup>
-import useApi from '~/services/api'
-import { toast } from '~/composables/useToast'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import useApi from '~/services/api';
+import { toast } from '~/composables/useToast';
+import { useAuth } from '~/composables/useAuth'; // 导入 useAuth 组合函数
 
-const api = useApi()
+const api = useApi();
 const formData = ref({
   username: '',
   password: ''
-})
+});
 
-const loading = ref(false)
-const error = ref('')
-const { setToken } = useAuth()
-const router = useRouter()
+const loading = ref(false);
+const error = ref('');
+const { setToken } = useAuth(); // 从 useAuth 获取 setToken 方法
+const router = useRouter(); // 使用 Router 进行页面导航
 
-
+// 处理登录逻辑
 const handleLogin = async () => {
   try {
-    loading.value = true
-    error.value = ''
+    loading.value = true;
+    error.value = '';
 
-    const response = await api.login(formData.value)
+    const response = await api.login(formData.value);
     if (response.success) {
-      setToken(response.token)
-      toast.showToast('登录成功', 'success')
-      router.push('/upload')
+      setToken(response.token); // 保存用户 token
+      toast.showToast('登录成功', 'success'); // 显示成功提示
+      router.push('/upload'); // 导航到上传页面
     } else {
-      error.value = response.message
+      error.value = response.message; // 显示错误信息
     }
   } catch (err) {
-    error.value = err.message
+    error.value = err.message; // 捕获并显示错误信息
   } finally {
-    loading.value = false
+    loading.value = false; // 登录完成后重置加载状态
   }
 }
 </script>
